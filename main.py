@@ -14,10 +14,9 @@ words = set(nltk.corpus.words.words())
 infile = 'training.1600000.processed.noemoticon.csv'
 clean_tweet = ''
 
+# y param for training model
 training_data = pd.read_csv(infile, encoding="ISO-8859-1")
 y = training_data['0']
-
-labelIndexer = StringIndexer(inputCol="label", outputCol="indexedLabel").fit(training_data)
 
 
 def cleaner(tweet):
@@ -31,6 +30,7 @@ def cleaner(tweet):
     return tweet
 
 
+# x(clean_tweet) for training model
 with open(infile, 'r') as csvfile:
     rows = csv.reader(csvfile)
     for row in rows:
