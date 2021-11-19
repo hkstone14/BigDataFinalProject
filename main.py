@@ -25,8 +25,8 @@ def cleaner(tweet):
     tweet = " ".join(tweet.split())
     tweet = ''.join(c for c in tweet if c not in emoji.UNICODE_EMOJI)
     tweet = tweet.replace("#", "").replace("_", " ")
-    tweet = " ".join(w for w in nltk.wordpunct_tokenize(tweet) \
-                     if w.lower() in words or not w.isalpha())
+    # tweet = " ".join(w for w in nltk.wordpunct_tokenize(tweet) \
+    #                  if w.lower() in words or not w.isalpha())
     return tweet
 
 
@@ -36,5 +36,6 @@ with open(infile, 'r') as csvfile:
     for row in rows:
         data = row[5]
         clean_tweet = cleaner(data)
+        X = pd.DataFrame(eval(clean_tweet))
         model = DecisionTreeClassifier()
-        model.fit(clean_tweet, y)
+        model.fit(X, y)
