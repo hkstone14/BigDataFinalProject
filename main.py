@@ -1,5 +1,7 @@
 import pandas as pd
 import csv
+
+from pyspark.ml.feature import StringIndexer
 from textblob import TextBlob
 import re
 import emoji
@@ -15,7 +17,7 @@ clean_tweet = ''
 training_data = pd.read_csv(infile, encoding="ISO-8859-1")
 y = training_data['0']
 
-labelIndexer = StringIndexer(inputCol="label", outputCol="indexedLabel").fit(data)
+labelIndexer = StringIndexer(inputCol="label", outputCol="indexedLabel").fit(training_data)
 
 
 def cleaner(tweet):
