@@ -1,41 +1,53 @@
-import pandas as pd
-import csv
-
-from pyspark.ml.feature import StringIndexer
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import *
+from pyspark.sql.types import *
+from pyspark.sql import functions as F
 from textblob import TextBlob
-import re
-import emoji
-import nltk
-from pyspark.ml.classification import DecisionTreeClassifier
-
-nltk.download('words')
-words = set(nltk.corpus.words.words())
-
-infile = 'training.1600000.processed.noemoticon.csv'
-clean_tweet = ''
-
-# y param for training model
-training_data = pd.read_csv(infile, encoding="ISO-8859-1")
-y = training_data['0']
+import findspark as fs
+from pyspark.context import SparkContext
+from pyspark import SQLContext, SparkConf
 
 
-def cleaner(tweet):
-    tweet = re.sub("@[A-Za-z0-9]+", "", tweet)
-    tweet = re.sub(r"(?:\@|http?\://|https?\://|www)\S+", "", tweet)
-    tweet = " ".join(tweet.split())
-    tweet = ''.join(c for c in tweet if c not in emoji.UNICODE_EMOJI)
-    tweet = tweet.replace("#", "").replace("_", " ")
-    # tweet = " ".join(w for w in nltk.wordpunct_tokenize(tweet) \
-    #                  if w.lower() in words or not w.isalpha())
-    return tweet
+def cleaner(tweets):
+    words = tweets.select(explode(split(tweets.value, "t_end")).alias("word"))
+    words = words.na.replace('', None)
+    words = words.na.drop()
+    words = words.withColumn('word', F.regexp_replace('word', r'http\S+', ''))
+    words = words.withColumn('word', F.regexp_replace('word', '@\w+', ''))
+    words = words.withColumn('word', F.regexp_replace('word', '#', ''))
+    words = words.withColumn('word', F.regexp_replace('word', 'RT', ''))
+    words = words.withColumn('word', F.regexp_replace('word', ':', ''))
+    return words
 
 
-# x(clean_tweet) for training model
-with open(infile, 'r') as csvfile:
-    rows = csv.reader(csvfile)
-    for row in rows:
-        data = row[5]
-        clean_tweet = cleaner(data)
-        X = pd.DataFrame(eval(clean_tweet))
-        model = DecisionTreeClassifier()
-        model.fit(X, y)
+# text classification
+def polarity_detection(text):
+    return TextBlob(text).sentiment.polarity
+
+
+def subjectivity_detection(text):
+    return TextBlob(text).sentiment.subjectivity
+
+
+def text_classification(words):
+    # polarity detection
+    polarity_detection_udf = udf(polarity_detection, StringType())
+    words = words.withColumn("polarity", polarity_detection_udf("word"))
+    # subjectivity detection
+    subjectivity_detection_udf = udf(subjectivity_detection, StringType())
+    words = words.withColumn("subjectivity", subjectivity_detection_udf("word"))
+    return words
+
+
+if __name__ == "__main__":
+    # create Spark session
+    fs.init()
+    spark = SparkSession.builder.appName("MyBigDataStreamingApp").getOrCreate()
+    # read the tweet data from socket
+    tweets = spark.readStream.format("socket").option("host", "0.0.0.0").option("port", 5555).load()
+    # Preprocess the data
+    words = cleaner(tweets)
+    # text classification to define polarity and subjectivity
+    words = text_classification(words)
+    words = words.repartition(1)
+    print(words)
