@@ -3,9 +3,12 @@ from pyspark.sql.functions import *
 from pyspark.sql.types import *
 from pyspark.sql import functions as F
 from textblob import TextBlob
+import os
+import tweepy as tw
 import findspark as fs
-from pyspark.context import SparkContext
-from pyspark import SQLContext, SparkConf
+from pyspark import SparkContext
+from pyspark.streaming import StreamingContext
+from pyspark.sql import SQLContext
 
 
 def cleaner(tweets):
@@ -42,9 +45,9 @@ def text_classification(words):
 if __name__ == "__main__":
     # create Spark session
     fs.init()
-    spark = SparkSession.builder.appName("MyBigDataStreamingApp").getOrCreate()
+    spark = SparkSession.builder.appName("MyBigDataStreamingApp1").getOrCreate()
     # read the tweet data from socket
-    tweets = spark.readStream.format("socket").option("host", "0.0.0.0").option("port", 5555).load()
+    tweets = spark.readStream.format("socket").option("host", "127.0.0.1").option("port", 5559).load()
     # Preprocess the data
     words = cleaner(tweets)
     # text classification to define polarity and subjectivity
