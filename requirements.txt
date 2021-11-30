@@ -1,0 +1,11 @@
+pymongo==3.12.1
+pytweets==0.2
+pyspark==3.2.0
+nltk~=3.6.5
+textblob~=0.17.1
+django-emoji~=2.2.2
+twitter==1.19.3
+tweepy==4.4.0
+findspark~=1.4.2
+
+### pip3 install -r requirements.txt
