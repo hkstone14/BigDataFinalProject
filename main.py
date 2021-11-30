@@ -53,4 +53,10 @@ if __name__ == "__main__":
     # text classification to define polarity and subjectivity
     words = text_classification(words)
     words = words.repartition(1)
-    print(words)
+    #print(words)
+    query = words.writeStream.queryName("all_tweets") \
+        .outputMode("append").format("parquet") \
+        .option("path", "./parc") \
+        .option("checkpointLocation", "./check") \
+        .trigger(processingTime='60 seconds').start()
+    query.awaitTermination()
