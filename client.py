@@ -6,7 +6,9 @@ if __name__ == "__main__":
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
-        # s.sendall(b'Hello, world')
-        data = s.recv(1024).decode()
+        td = 1
+        while td == 1:
+            data = s.recv(1024).decode()
+            print('Received data : ', repr(data))
 
-    print('Received', repr(data))
+    #print('Received', repr(data))
