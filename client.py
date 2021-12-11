@@ -10,4 +10,4 @@ if __name__ == "__main__":
             data = s.recv(1024).decode()
             print('Received data : ', repr(data))
 
-    #print('Received', repr(data))
+    # print('Received', repr(data))
