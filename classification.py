@@ -20,8 +20,8 @@ infile = 'training.1600000.processed.noemoticon.csv'
 clean_tweet = ''
 
 # y param for training model
-training_data = pd.read_csv(infile, encoding="ISO-8859-1")
-test_data = pd.read_csv('testdata.manual.2009.06.14.csv', encoding="ISO-8859-1")
+training_data = pd.DataFrame(pd.read_csv(infile, encoding="ISO-8859-1"))
+test_data = pd.DataFrame(pd.read_csv('testdata.manual.2009.06.14.csv', encoding="ISO-8859-1"))
 # y = training_data['0']
 
 
@@ -44,6 +44,7 @@ if __name__ == "__main__":
     #     data = row[5]
     #     clean_tweet = cleaner(data)
     #     X = pd.DataFrame(eval(clean_tweet))
+
     labelIndexer = StringIndexer(inputCol="label", outputCol="indexedLabel").fit(training_data)
     featureIndexer = VectorIndexer(inputCol="features", outputCol="indexedFeatures", maxCategories=4).fit(
         training_data)
