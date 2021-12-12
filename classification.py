@@ -1,5 +1,4 @@
 from ctypes import Array
-
 import pandas as pd
 import csv
 from pyspark.ml import Pipeline
@@ -7,14 +6,14 @@ from pyspark.ml.classification import DecisionTreeClassifier
 from pyspark.ml.feature import StringIndexer, VectorIndexer
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
 from pyspark.mllib.util import MLUtils
-from textblob import TextBlob
+# from textblob import TextBlob
 import re
 
-import nltk
-
-
-nltk.download('words')
-words = set(nltk.corpus.words.words())
+# import nltk
+#
+#
+# nltk.download('words')
+# words = set(nltk.corpus.words.words())
 
 infile = 'training.1600000.processed.noemoticon.csv'
 clean_tweet = ''
