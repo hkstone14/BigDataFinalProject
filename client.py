@@ -1,4 +1,5 @@
 import socket
+import pickle
 
 if __name__ == "__main__":
     HOST = 'localhost'  # The server's hostname or IP address
